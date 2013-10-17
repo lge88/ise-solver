@@ -6,7 +6,9 @@
   "keywords": [],
   "dependencies": {
     "lge88/extend": "*",
-    "lge88/ise-to-opensees": "*"
+    "lge88/ise-to-opensees": "*",
+    "microjs/q": "*",
+    "lge88/arr-gen": "*"
   },
   "development": {
     "lge88/expect.js": "*"
@@ -19,7 +21,9 @@
   "_test": "https://github.com/lge88/ise-solver/tree/master/test",
   "_homepage": "https://github.com/lge88/ise-solver",
   "scripts": [
-    "lib/index.js"
+    "lib/index.js",
+    "lib/ISESolver.common.js",
+    "lib/ISESolver.io.Client.js"
   ],
   "main": "lib/index.js",
   "_rename_": [
@@ -37,9 +41,7 @@
     "lib-client"
   ],
   "_auto_update_file_list_": {
-    "folders": [
-      "lib"
-    ]
+    "folders": []
   },
   "_auto_index_files_": [],
   "paths": [

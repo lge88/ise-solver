@@ -28,10 +28,13 @@ component.json: $(SRC)
 test:
 	NODE_PATH=.. mocha test
 
+server:
+	node server.js
+
 browser-test: build
-	$(OPEN) test/index.html
+	$(OPEN) 'http://localhost:3000/browser-test'
 
 demo: build
 	$(OPEN) examples/index.html
 
-.PHONY: clean ise-solver.js test
+.PHONY: clean ise-solver.js test browser-test server

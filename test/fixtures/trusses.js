@@ -1,5 +1,7 @@
 
 module.exports = exports = {
+  id: 'trusses-12345',
+  rev: '12123',
   model_builder: { type: 'BasicBuilder', ndm: 2, ndf: 2 },
   materials: [
     { id: 1, type: 'uniaxial.Elastic', E: 3000 }

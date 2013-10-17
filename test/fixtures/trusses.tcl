@@ -112,37 +112,4 @@ analyze 1
 
 # Print the current state at node 4 and at all elements
 puts "node 4 displacement: [nodeDisp 4]"
-# print node 4
-# print ele
-
-# proc nodalDispToJSON {nlist} {
-#     puts
-#     set res "{"
-#     append res "\"time\":[getTime],"
-#     append res "\"type\":\"NodalDisplacement\","
-#     append res "\"data\":\["
-#     proc trimIt x { return [string trim $x] }
-#     proc map {fun list} {
-#         set res {}
-#         foreach element $list {lappend res [$fun $element]}
-#         set res
-#     }
-#     set len [llength $nlist]
-#     for {set k 0} {$k < [expr $len-1]} {incr k} {
-#         set i [lindex $nlist $k]
-#         set coord [map trimIt [split [nodeDisp $i]]]
-#         append res "$i,"
-#         append res "[join [nodeDisp $i] ,]"
-#         append res ","
-#     }
-#     set i [lindex $nlist $k]
-#     set coord [map trimIt [split [nodeDisp $i]]]
-#     append res "$i,"
-#     append res "[join [nodeDisp $i] ,]"
-#     append res "\]"
-#     append res "}"
-#     return $res;
-# }
-
-# puts [nodalDispToJSON [list 1 4 3]]
-# # puts [nodalDispToJSON]
+puts "element 1 end forces: [eleResponse 1 forces]"

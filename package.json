@@ -1,13 +1,15 @@
 {
   "name": "ise-solver",
   "version": "0.0.1",
-  "repository" : {
-    "type" : "git",
-    "url" : "http://github.com/lge88/ise-solver.git"
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/lge88/ise-solver.git"
   },
   "dependencies": {
     "extend": "git+https://github.com/lge88/extend.git",
-    "composable": "git+https://github.com/lge88/composable.git"
+    "composable": "git+https://github.com/lge88/composable.git",
+    "ise-to-opensees": "git+https://github.com/lge88/ise-to-opensees.git",
+    "q": "~0.9.7"
   },
   "devDependencies": {
     "expect.js": "*"
