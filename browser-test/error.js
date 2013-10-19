@@ -65,10 +65,9 @@ describe( 'ise-solver error test', function() {
       .report({ type: 'node_disp' })
       .analyze( 10 )
       .then(function( finalState ) {
-        console.log( 'err', finalState )
 
       }, function( err ) {
-        expect( err.message ).to.match( /ISESolver/ );
+        expect( err ).to.match( /ISESolver/ );
 
         // do it again with correct one:
         trusses.nodes = nodes;

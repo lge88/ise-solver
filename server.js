@@ -36,7 +36,7 @@ var io = require( 'socket.io' )
 
 // FIXME: so the server do not work if
 // numOfNodes > 4
-var numOfNodes = 2;
+var numOfNodes = 10;
 var nodes = arrgen( numOfNodes, function( i ) {
   return new ISESolverIOServer( { id: i } );
 } );
