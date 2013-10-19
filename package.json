@@ -9,7 +9,9 @@
     "extend": "git+https://github.com/lge88/extend.git",
     "composable": "git+https://github.com/lge88/composable.git",
     "ise-to-opensees": "git+https://github.com/lge88/ise-to-opensees.git",
-    "q": "~0.9.7"
+    "q": "~0.9.7",
+    "debug": "~0.7.2",
+    "mkdirp": "~0.3.5"
   },
   "devDependencies": {
     "expect.js": "*"

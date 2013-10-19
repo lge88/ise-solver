@@ -11,7 +11,13 @@
     "lge88/arr-gen": "*"
   },
   "development": {
-    "lge88/expect.js": "*"
+    "lge88/expect.js": "*",
+    "lge88/arr-gen": "*",
+    "lge88/ise-viewport": "*",
+    "lge88/three-build": "*",
+    "lge88/three-normalize-geometry": "*",
+    "lge88/ise-editor-controls": "*",
+    "lge88/dat-gui": "*"
   },
   "repository": {
     "type": "git",

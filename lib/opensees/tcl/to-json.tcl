@@ -50,3 +50,27 @@ proc element_force_to_json {nlist} {
     append res "}"
     return $res;
 }
+
+
+proc element_stress_to_json {nlist} {
+    set res "{"
+    append res "\"time\":[getTime],"
+    append res "\"type\":\"element_stress\","
+    append res "\"data\":\{"
+    set len [llength $nlist]
+    for {set k 0} {$k < [expr $len-1]} {incr k} {
+        set i [lindex $nlist $k]
+        append res "\"$i\":\["
+        append res "[join [eleResponse $i stresses] ,]"
+        append res "\]"
+        append res ","
+    }
+    set i [lindex $nlist $k]
+    set coord [map trimIt [split [nodeDisp $i]]]
+    append res "\"$i\":\["
+    append res "[join [eleResponse $i stresses] ,]"
+    append res "\]"
+    append res "\}"
+    append res "}"
+    return $res;
+}

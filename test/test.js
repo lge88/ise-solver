@@ -134,4 +134,38 @@ describe( 'ise-solver', function() {
       .then( done, done );
   } );
 
+  it( 'should output correct result for quads', function( done ) {
+    var model = require( './fixtures/quads' );
+    var solver = new ISESolver();
+
+    solver
+      .model( model )
+      .analysisType( 'static' )
+      .boilerplate()
+      .report({ type: 'element_force', elements: [ 1 ] })
+      .analyze( 10 )
+      .then(function( finalState ) {
+        // console.log( 'finalState: ', finalState );
+
+        // // debug( 'element', finalState );
+        // var e1_start_x = -26.36111332558741793264;
+        // var e1_start_y = -35.14815110078322391018;
+        // var e1_end_x = 26.36111332558741793264;
+        // var e1_end_y = 35.14815110078322391018;
+        // var tol = 1e-10;
+        // expect( finalState.element_force[ 1 ][ 0 ] - e1_start_x ).to.be.within( -tol, tol );
+        // expect( finalState.element_force[ 1 ][ 1 ] - e1_start_y ).to.be.within( -tol, tol );
+        // expect( finalState.element_force[ 1 ][ 2 ] - e1_end_x ).to.be.within( -tol, tol );
+        // expect( finalState.element_force[ 1 ][ 3 ] - e1_end_y ).to.be.within( -tol, tol );
+        // expect( Object.keys( finalState.element_force ) )
+        //   .to.eql( [ '1' ] );
+      }, function( err ) {
+        console.log( err );
+        // console.log( err );
+      }, function( state ) {
+        // console.log( 'state', state );
+      })
+      .then( done, done );
+  } );
+
 } );
