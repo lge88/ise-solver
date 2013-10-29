@@ -8,15 +8,16 @@ var ISESolver = require( 'ise-solver' );
 var port = 3000;
 var ns = '/solve';
 var socket = io.connect( 'http://localhost:' + port + ns );
+ISESolver.socket = socket;
 
 describe( 'quads', function() {
 
   it( 'should output correct result for quads', function( done ) {
 
 
-    var p = -1e3;
+    var p = 100e3;
     var E = 200.0e9;
-    var b = 0.50;
+    var b = 0.1250;
     var l = 1.0;
     var v = 0.3;
 
@@ -32,7 +33,7 @@ describe( 'quads', function() {
       { x: 0, y: 0 }, { x: l, y: 0 },
       { x: l, y: h }, { x: 0, y: h },
       50,
-      10
+      20
     );
 
     var mat = {
@@ -45,7 +46,7 @@ describe( 'quads', function() {
       .map( function( el ) {
         el.thick = b;
         el.material_id = 1;
-        el.subType = 'PlaneStrain';
+        el.subType = 'PlaneStress';
         return el;
       } );
 
@@ -118,7 +119,7 @@ describe( 'quads', function() {
       }
     }
 
-    var solver = new ISESolver( socket );
+    var solver = new ISESolver();
     // var solver = new ISESolver();
 
     solver
@@ -129,20 +130,25 @@ describe( 'quads', function() {
         // { type: 'element_force', elements: [ 1 ] },
         { type: 'node_disp', nodes: rightEdgeNodesId },
       ])
-
-    solver
       .analyze( 10 )
       .then(function( finalState ) {
-        // console.log( 'finalState: ', finalState );
-        console.log( 'node_disp', finalState.node_disp );
+        var relative_tol = 0.05;
+        var node_disp = finalState.node_disp;
+        var nids = Object.keys( node_disp );
+        var dy_average = nids.reduce( function( total, k ) {
+          return node_disp[ k ][ 1 ] + total;
+        }, 0 ) / nids.length;
+        var err = Math.abs( ( dy_average - dtipExpect )/dtipExpect );
 
+        console.log( 'computed:', dy_average );
+        console.log( 'relative error:', err );
+        expect( err ).to.lessThan( relative_tol );
       }, function( err ) {
         console.log( err );
-        // console.log( err );
       }, function( state ) {
         // console.log( 'state', state );
       })
-      .then( done, done );
+      .done( done, done );
 
   } );
 

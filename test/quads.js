@@ -10,9 +10,9 @@ describe( 'ise-solver', function() {
 
     var p = -100e3;
     var E = 200.0e9;
-    var b = 0.050;
+    var b = 0.1250;
     var l = 1.0;
-    var v = 0.49;
+    var v = 0.3;
 
     var A = b*b;
     var h = b;
@@ -21,8 +21,7 @@ describe( 'ise-solver', function() {
 
     console.log( 'expect', dtipExpect );
 
-
-    var nx = 20, ny = 10;
+    var nx = 50, ny = 20;
     var blk = block2d(
       { x: 0, y: 0 }, { x: l, y: 0 },
       { x: l, y: h }, { x: 0, y: h },
@@ -40,7 +39,7 @@ describe( 'ise-solver', function() {
       .map( function( el ) {
         el.thick = b;
         el.material_id = 1;
-        el.subType = 'PlaneStrain';
+        el.subType = 'PlaneStress';
         return el;
       } );
 
@@ -142,20 +141,28 @@ describe( 'ise-solver', function() {
       .analyze( 10 )
       .then(function( finalState ) {
         expect( Object.keys( finalState.node_disp ).length ).to.be( (nx+1)*(ny+1) );
-        // console.log( finalState );
-
         expect( Object.keys( finalState.element_force ).length ).to.be( nx*ny );
         expect( Object.keys( finalState.element_stress ).length ).to.be( nx*ny );
-        // console.log( finalState.element_stress );
 
-        // expect( Object.keys( finalState.node_disp ).length ).to.be( 561 );
+        var relative_tol = 0.05;
+        var rightEdgeNodeDisps = rightEdgeNodesId.map( function( id ) {
+          return finalState.node_disp[ id ]
+        } )
+
+        var dy_average = rightEdgeNodeDisps.reduce( function( total, disp ) {
+          return disp[ 1 ] + total;
+        }, 0 ) / rightEdgeNodeDisps.length;
+        var err = Math.abs( ( dy_average - dtipExpect )/dtipExpect );
+
+        console.log( 'computed:', dy_average );
+        console.log( 'relative error:', err );
+        expect( err ).to.lessThan( relative_tol );
       }, function( err ) {
-        // console.log( err );
         // console.log( err );
       }, function( state ) {
         // console.log( 'state', state );
       })
-      .then( done, done );
+      .done( done, done );
   } );
 
 } );

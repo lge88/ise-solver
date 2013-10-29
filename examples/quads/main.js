@@ -20,7 +20,7 @@ var camera = viewport.camera;
 
 var p = 100e3;
 var E = 200.0e9;
-var b = 0.250;
+var b = 0.125;
 var l = 1.0;
 var v = 0.3;
 
@@ -93,7 +93,7 @@ function toArc( n ) {
   return n;
 }
 
-nodes = nodes.map( toArc )
+// nodes = nodes.map( toArc )
 
 var elements = blk.elements
   .map( function( el ) {
@@ -210,7 +210,13 @@ solver
     stressed = drawStressField( blk, stressField );
     stressed.scale.set( 400, 400, 400 );
     scene.add( stressed );
-    console.log( element_stress );
+    // console.log( element_stress );
+    console.log(
+      Object.keys( rightEdgeNodesId ).map( function( k ) {
+        // debugger;
+        return node_disp[ this[ k ] ];
+      }, rightEdgeNodesId )
+    );
 
     deformed = drawDeformed( blk, node_disp );
     deformed.scale.set( 400, 400, 400 );
@@ -278,24 +284,20 @@ function drawBlock( blk ) {
   return referenced;
 }
 
-function drawDeformed( blk, nodeDisp ) {
+function drawDeformed( blk, nodeDisp, s ) {
   var geo = new THREE.Geometry();
-  // var range = Object
-  //   .keys( nodeDisp )
-  //   .reduce( function( obj, k ) {
-  //     var disp = nodeDisp[ k ];
-  //     if
-  //   }, { min: Infinity, max: -Infinity } );
-  var s = demoOptions['deformation scale'];
+  var maxDispOnScreen = 0.2;
+  var scaled = autoScale( nodeDisp, maxDispOnScreen );
   geo.vertices = blk.nodes.map( function( n ) {
     n.position.z = 0;
-    var disp = nodeDisp[ n.id ];
+    // var disp = nodeDisp[ n.id ];
+    var disp = scaled[ n.id ];
     var vec = ( new THREE.Vector3() ).copy( n.position );
     if ( disp ) {
       vec.add( {
-        x: disp[0] * s,
-        y: disp[1] * s,
-        z: 0
+        x: disp[0] || 0.0,
+        y: disp[1] || 0.0,
+        z: disp[2] || 0.0
       } );
     }
     return vec;
@@ -309,6 +311,48 @@ function drawDeformed( blk, nodeDisp ) {
   } );
   var referenced = new THREE.ParticleSystem( geo, mat );
   return referenced;
+}
+
+function getRange( nodeDisp ) {
+  var nids = Object.keys( nodeDisp );
+  var dim = nodeDisp[ nids[ 0 ] ].length;
+  var ret = new Array( dim );
+  for ( i = 0; i < dim; ++i ) {
+    ret[ i ] = { max: -Infinity, min: +Infinity };
+  }
+
+  return Object
+    .keys( nodeDisp )
+    .reduce( function( ret, k ) {
+      nodeDisp[ k ].forEach( function( disp, dim ) {
+        ( disp > ret[ dim ].max ) && ( ret[ dim ].max = disp );
+        ( disp < ret[ dim ].min ) && ( ret[ dim ].min = disp );
+      } );
+      return ret;
+    }, ret );
+}
+
+function autoScale( nodeDisp, targetMaxDisp ) {
+  targetMaxDisp || ( targetMaxDisp = 50 );
+  var absRange = getRange( nodeDisp )
+    .map( function( r ) {
+      return Math.max(
+        Math.abs( r.max ),
+        Math.abs( r.min )
+      );
+    } );
+
+  var maxDisp = Math.max.apply( null, absRange );
+  var scale = targetMaxDisp / maxDisp;
+
+  var nids = Object.keys( nodeDisp );
+  var out = {};
+  nids.forEach(function( x ) {
+    out[ x ] = nodeDisp[ x ].map(function( x ) {
+      return x * scale;
+    });
+  });
+  return out;
 }
 
 function makeStressField( blk, stresses ) {
@@ -429,4 +473,42 @@ function drawStressField( blk, field ) {
   } );
   var referenced = new THREE.Mesh( geo, mat );
   return referenced;
+}
+
+// assume scalarField is sorted
+function sample( scalarField, n ) {
+  var out = new Array( n );
+}
+
+function colorMapWidget( scalars, numOfSteps, w, h ) {
+  var step = Math.round( scalars.length / numOfSteps );
+  var normalized = normalize( scalars );
+  function draw( canvas, x, y ) {
+    var ctx = canvas.getContext( '2d' );
+    var grad = ctx.createLinearGradient( 0, 0, 0, h );
+    normalized
+      .filter( function( x, ind ) {
+        return ind % step === 0;
+      } )
+      .forEach(function( x ) {
+        grad.addColorStop()
+      })
+  }
+}
+
+
+function Field( data, ndf ) {
+  this._ids = [];
+  this._data = [];
+  this.dim = 1;
+  this.size = 1;
+  if ( Array.isArray( data ) ) {
+    this.dim = map[ 0 ].length;
+    this._data = map.slice();
+  } else if ( typeof data === 'object' ) {
+    this._ids = Object.keys( data );
+    this._data = this._ids.map( function( id ) {
+      return data[ id ];
+    } );
+  }
 }
