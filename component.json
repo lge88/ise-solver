@@ -8,7 +8,8 @@
     "lge88/extend": "*",
     "lge88/ise-to-opensees": "*",
     "microjs/q": "*",
-    "lge88/arr-gen": "*"
+    "lge88/arr-gen": "*",
+    "lge88/flatten": "*"
   },
   "development": {
     "lge88/expect.js": "*",
