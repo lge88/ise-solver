@@ -8,7 +8,7 @@ var socket = io.connect( 'http://localhost:' + port + ns );
 
 describe( 'ise-solver error test', function() {
 
-  var trusses = {
+  var model = {
     id: 'trusses-12345',
     rev: '12123',
     model_builder: { type: 'BasicBuilder', ndm: 2, ndf: 2 },
@@ -39,45 +39,43 @@ describe( 'ise-solver error test', function() {
     ],
     patterns: [
       { id: 1, type: 'Plain', time_series_id: 1, load_id: [ 1 ] }
-    ],
-    analysis: {
-      system: { type: 'BandSPD' },
-      numberer: { type: 'RCM' },
-      constraints: { type: 'Plain' },
-      integrator: { type: 'LoadControl', lambda: 0.1 },
-      algorithm: { type: 'Linear' },
-      analysis: { type: 'Static' }
-    }
+    ]
   };
+
+  var analysis =  {
+    type: 'Static',
+    steps: 10,
+    system: { type: 'BandSPD' },
+    numberer: { type: 'RCM' },
+    constraints: { type: 'Plain' },
+    integrator: { type: 'LoadControl', lambda: 0.1 },
+    algorithm: { type: 'Linear' }
+  };
+
+  var recorder = [
+    { type: 'node_disp' }
+  ];
 
   it( 'should recover after opensees error', function( done ) {
     var solver = new ISESolver( socket );
     var statesCount = 0;
 
-    var nodes = trusses.nodes;
+    var nodes = model.nodes;
 
-    delete trusses.nodes;
+    delete model.nodes;
 
     solver
-      .model( trusses )
-      .analysisType( 'static' )
-      .boilerplate()
-      .report({ type: 'node_disp' })
-      .analyze( 10 )
+      .solve( model, analysis, recorder )
       .then(function( finalState ) {
 
       }, function( err ) {
         expect( err ).to.match( /ISESolver/ );
 
         // do it again with correct one:
-        trusses.nodes = nodes;
+        model.nodes = nodes;
 
         solver
-          .model( trusses )
-          .analysisType( 'static' )
-          .boilerplate()
-          .report({ type: 'node_disp' })
-          .analyze( 10 )
+          .solve( model, analysis, recorder )
           .then(function( finalState ) {
             var x = 0.53009277713228375450;
             var y = -0.17789363846931768864;
@@ -85,7 +83,7 @@ describe( 'ise-solver error test', function() {
             expect( finalState.node_disp[ 4 ][ 1 ] - y ).to.be.within( -1e-8, 1e-8 );
             expect( finalState.node_disp[ 3 ][ 1 ] - y ).to.not.be.within( -1e-8, 1e-8 );
             expect( Object.keys( finalState.node_disp ).length )
-              .to.be( trusses.nodes.length );
+              .to.be( model.nodes.length );
           } )
           .then( done, done );
 

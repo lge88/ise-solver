@@ -9,7 +9,7 @@
     <div id="mocha"></div>
     <script src="/socket.io/socket.io.js"></script>
     <script src="mocha/mocha.js"></script>
-    <script>mocha.setup('bdd')</script>
+    <script>mocha.setup('bdd');mocha.setup({globals: ['io']});</script>
     <script src="../build/build.js"></script>
     <script src="test.js"></script>
     <script src="quads.js"></script>

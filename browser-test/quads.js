@@ -8,12 +8,10 @@ var ISESolver = require( 'ise-solver' );
 var port = 3000;
 var ns = '/solve';
 var socket = io.connect( 'http://localhost:' + port + ns );
-ISESolver.socket = socket;
 
 describe( 'quads', function() {
 
   it( 'should output correct result for quads', function( done ) {
-
 
     var p = 100e3;
     var E = 200.0e9;
@@ -27,7 +25,6 @@ describe( 'quads', function() {
     var dtipExpect = p*l*l*l/3/E/I;
 
     console.log( 'expect', dtipExpect );
-
 
     var blk = block2d(
       { x: 0, y: 0 }, { x: l, y: 0 },
@@ -75,7 +72,7 @@ describe( 'quads', function() {
 
     var forcePerNode = p / rightEdge.length;
 
-    var idCount = 0;
+    idCount = 0;
     var loads = rightEdge
       .map( function( n ) {
         return {
@@ -108,29 +105,28 @@ describe( 'quads', function() {
           id: 1, type: 'Plain', time_series_id: 1,
           load_id: load_id
         }
-      ],
-      analysis: {
-        system: { type: 'BandSPD' },
-        numberer: { type: 'RCM' },
-        constraints: { type: 'Plain' },
-        integrator: { type: 'LoadControl', lambda: 0.1 },
-        algorithm: { type: 'Linear' },
-        analysis: { type: 'Static' }
-      }
-    }
+      ]
+    };
 
-    var solver = new ISESolver();
-    // var solver = new ISESolver();
+    var  analysis =  {
+      type: 'Static',
+      steps: 10,
+      system: { type: 'BandSPD' },
+      numberer: { type: 'RCM' },
+      constraints: { type: 'Plain' },
+      integrator: { type: 'LoadControl', lambda: 0.1 },
+      algorithm: { type: 'Linear' }
+    };
+
+    var recorder =  [
+      // { type: 'element_force', elements: [ 1 ] }
+      , { type: 'node_disp', nodes: rightEdgeNodesId }
+    ];
+
+    var solver = new ISESolver( socket );
 
     solver
-      .model( model )
-      .analysisType( 'static' )
-      .boilerplate()
-      .report([
-        // { type: 'element_force', elements: [ 1 ] },
-        { type: 'node_disp', nodes: rightEdgeNodesId },
-      ])
-      .analyze( 10 )
+      .solve(model, analysis, recorder)
       .then(function( finalState ) {
         var relative_tol = 0.05;
         var node_disp = finalState.node_disp;
@@ -144,7 +140,7 @@ describe( 'quads', function() {
         console.log( 'relative error:', err );
         expect( err ).to.lessThan( relative_tol );
       }, function( err ) {
-        console.log( err );
+        // console.log( err );
       }, function( state ) {
         // console.log( 'state', state );
       })
@@ -185,7 +181,7 @@ function block2d( p1, p2, p3, p4, nx, ny ) {
     return { id: id++, position: lerp( a, b, i/nx ) };
   } );
 
-  var id = 1;
+  id = 1;
   var elements = arrgen( nx, ny, function( i, j ) {
     var n1 = nodes[ i ][ j ].id, n2 = nodes[ i+1 ][ j ].id;
     var n3 = nodes[ i+1 ][ j+1 ].id, n4 = nodes[ i ][ j+1 ].id;
@@ -193,4 +189,4 @@ function block2d( p1, p2, p3, p4, nx, ny ) {
   } );
 
   return { nodes: flatten( nodes ), elements: flatten( elements ) };
-}
+};
