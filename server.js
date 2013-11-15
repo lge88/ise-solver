@@ -3,7 +3,10 @@ var express = require( 'express' );
 var sh = require( 'shelljs' );
 var arrgen = require( 'arr-gen' );
 
+var ISESolver = require( './lib' );
 var ISESolverIOServer = require( './lib' ).io.Server;
+
+// ISESolver.OpenSees.dataPort = 8005;
 var port = 3000;
 var ns = '/solve';
 
